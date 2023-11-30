@@ -1,0 +1,105 @@
+-- Question 1 
+
+UPDATE TicketType tt
+JOIN Event e ON tt.EventID = e.EventID
+SET tt.TotalTickets = tt.TotalTickets + 1200 
+WHERE (e.EventName = 'Exeter Food Festival 2023' or e.EventID=1)  AND tt.TicketTypeName = 'Adult';
+
+
+-- Question 2 
+
+-- Retrieve EventID for Exeter Food Festival
+SET @eventID := (
+  SELECT EventID
+  FROM Event
+  WHERE EventName = 'Exeter Food Festival 2023'
+);
+
+-- Retrieve TicketTypeIDs for adult and child tickets
+SET @adultTicketTypeID := (
+  SELECT TicketTypeID
+  FROM TicketType
+  WHERE EventID = @eventID
+  AND TicketTypeName = 'Adult'
+);
+
+SET @childTicketTypeID := (
+  SELECT TicketTypeID
+  FROM TicketType
+  WHERE EventID = @eventID
+  AND TicketTypeName = 'Child'
+);
+
+INSERT INTO Customer (FirstName, LastName, Email, Phone, Address)
+VALUES ('Ian', 'Cooper', 'iancooper@example.com', '1234567890', '123 Main Street'); 
+
+-- Insert records into Booking table
+INSERT INTO Booking (CustomerID, EventID, BookingDate, TotalAmount)
+VALUES (
+  (SELECT CustomerID FROM Customer WHERE FirstName = 'Ian' AND LastName = 'Cooper'),
+  @eventID,
+  CURDATE(),
+  (
+    SELECT (Price * 2 + (Price * 0.9))
+    FROM TicketType
+    WHERE TicketTypeID = @adultTicketTypeID
+  ) + (
+    SELECT (Price * 1 + (Price * 0.9))
+    FROM TicketType
+    WHERE TicketTypeID = @childTicketTypeID
+  )
+);
+
+-- Retrieve the generated BookingID from the previous insert
+SET @bookingID := LAST_INSERT_ID();
+
+-- Insert records into Ticket table
+INSERT INTO Ticket (BookingID, TicketTypeID, Quantity)
+VALUES
+  (@bookingID, @adultTicketTypeID, 2),
+  (@bookingID, @childTicketTypeID, 1);
+
+-- Insert records into TicketDelivery table
+INSERT INTO TicketDelivery (BookingID, DeliveryMethod, DeliveryStatus)
+VALUES (@bookingID, 'Email', 'Delivered');
+
+-- Insert records into Payment table
+INSERT INTO Payment (BookingID, CardType, CardNumber, SecurityCode, ExpiryDate)
+VALUES (@bookingID,'Credit Card','2222222222221111', '123', '2025-12-31');
+
+-- Insert records into Voucher table
+INSERT INTO Voucher (VoucherCode, EventID, DiscountPercentage)
+VALUES ('FOOD10', @eventID, 0.1);
+
+-- Question 3 
+
+-- assumes bookingID is 2
+
+-- Step 1: Delete Ticket Delivery Information
+DELETE FROM TicketDelivery 
+WHERE BookingID = 2;
+
+-- Step 2: Delete Payment Information
+DELETE FROM Payment 
+WHERE BookingID = 2;
+
+-- Step 3: Delete Ticket Information
+DELETE FROM Ticket 
+WHERE BookingID = 2;
+
+-- Step 4: Delete Booking Information
+DELETE FROM Booking 
+WHERE BookingID = 2;
+
+
+-- Question 4 
+
+SET @eventID := (
+  SELECT EventID
+  FROM Event
+  WHERE EventName = 'Exeter Food Festival 2023'
+);
+
+INSERT INTO Voucher (VoucherCode, EventID, DiscountPercentage)
+VALUES 
+('SUMMER20', @eventID, 0.2);

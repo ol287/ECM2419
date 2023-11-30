@@ -1,0 +1,156 @@
+-- Create the Customer table
+CREATE TABLE Customer (
+  CustomerID INT PRIMARY KEY AUTO_INCREMENT,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Email VARCHAR(100) NOT NULL,
+  Phone VARCHAR(20),
+  Address VARCHAR(255)
+);
+
+-- Create the Event table
+CREATE TABLE Event (
+  EventID INT PRIMARY KEY AUTO_INCREMENT,
+  EventName VARCHAR(100) NOT NULL,
+  EventDate DATE NOT NULL,
+  EventStartTime TIME,
+  EventEndTime TIME,
+  EventDescription VARCHAR(255)
+);
+
+-- Create the TicketType table
+CREATE TABLE TicketType (
+  TicketTypeID INT PRIMARY KEY AUTO_INCREMENT,
+  EventID INT,
+  TicketTypeName VARCHAR(50) NOT NULL,
+  Price DECIMAL(10,2) NOT NULL,
+  TotalTickets INT NOT NULL,
+  AvailableTickets INT NOT NULL,
+  FOREIGN KEY (EventID) REFERENCES Event(EventID)
+);
+
+-- Create the Booking table
+CREATE TABLE Booking (
+  BookingID INT PRIMARY KEY AUTO_INCREMENT,
+  CustomerID INT,
+  EventID INT,
+  BookingDate DATE NOT NULL,
+  TotalAmount DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
+  FOREIGN KEY (EventID) REFERENCES Event(EventID)
+);
+
+-- Create the Ticket table
+CREATE TABLE Ticket (
+  TicketID INT PRIMARY KEY AUTO_INCREMENT,
+  BookingID INT,
+  TicketTypeID INT,
+  Quantity INT NOT NULL,
+  FOREIGN KEY (BookingID) REFERENCES Booking(BookingID),
+  FOREIGN KEY (TicketTypeID) REFERENCES TicketType(TicketTypeID)
+);
+
+-- Create the Voucher table
+CREATE TABLE Voucher (
+  VoucherCode VARCHAR(20) PRIMARY KEY,
+  EventID INT,
+  DiscountPercentage FLOAT NOT NULL,
+  FOREIGN KEY (EventID) REFERENCES Event(EventID)
+);
+
+-- Create the Payment table
+CREATE TABLE Payment (
+  PaymentID INT PRIMARY KEY AUTO_INCREMENT,
+  BookingID INT,
+  CardType VARCHAR(50) NOT NULL,
+  CardNumber VARCHAR(16) NOT NULL,
+  SecurityCode VARCHAR(4) NOT NULL,
+  ExpiryDate DATE NOT NULL,
+  FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- Create the CardHolder table
+CREATE TABLE CardHolder (
+  CardholderID INT PRIMARY KEY AUTO_INCREMENT,
+  CustomerID INT,
+  CardHolderName VARCHAR(100) NOT NULL,
+  FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+-- Create the TicketDelivery table
+CREATE TABLE TicketDelivery (
+  DeliveryID INT PRIMARY KEY AUTO_INCREMENT,
+  BookingID INT,
+  DeliveryMethod VARCHAR(50) NOT NULL,
+  DeliveryStatus VARCHAR(50) NOT NULL,
+  FOREIGN KEY (BookingID) REFERENCES Booking(BookingID)
+);
+
+-- Insert data for the Exeter Food Festival 2023
+INSERT INTO Event (EventName, EventStartTime, EventEndTime, EventDate, EventDescription)
+VALUES 
+('Exeter Food Festival 2023', '09:00:00', '12:00:00', '2023-08-10', 'Annual food festival in Exeter'),
+('Emouth Music Festival 2023', '09:00:00', '12:00:00', '2023-09-10', 'Annual music festival in Emouth'),
+('Event 3', '09:00:00', '12:00:00', '2023-07-01', 'Event 3 description'),
+('Event 4', '14:00:00', '17:00:00', '2023-07-05', 'Event 4 description'),
+('Event 5', '10:30:00', '13:30:00', '2023-07-08', 'Event 5 description'),
+('Event 6', '18:00:00', '21:00:00', '2023-07-10', 'Event 6 description');
+
+
+-- Insert data for the ticket types
+INSERT INTO TicketType (EventID, TicketTypeName, Price, TotalTickets, AvailableTickets)
+VALUES
+    (1, 'Adult', 10.00, 100, 94),
+    (1, 'Child', 5.00, 50, 50),
+    (2, 'Gold', 50.00, 100, 99),
+    (2, 'Silver', 35.00, 150, 150),
+    (2, 'Bronze', 20.00, 50, 50);
+    
+
+    
+
+
+-- Insert test data into the Customer table
+INSERT INTO Customer (FirstName, LastName, Email, Phone, Address)
+VALUES ('John', 'Doe', 'johndoe@example.com', '1234567890', '123 Main Street'),
+       ('Joe', 'Smith', 'joesmith@example.com', '9876543210', '456 Oak Street'),
+       ('Jane', 'Doe', 'janedoe@example.com', '1234567890', '456 Main Street');
+
+
+
+
+INSERT INTO Booking (CustomerID, EventID, BookingDate, TotalAmount)
+VALUES (1, 2, '2023-05-10', 50.00),
+       (2,1,'2023-05-10', 10.00),
+       (3,2,'2023-05-10',50.00);
+
+
+INSERT INTO Ticket (BookingID, TicketTypeID, Quantity)
+VALUES (1, 1, 5),
+       (2,1,1),
+       (3,3,1);
+       
+
+INSERT INTO Payment (BookingID, CardType, CardNumber, SecurityCode, ExpiryDate)
+VALUES (1, 'Visa', '1111222233334444', '123', '2024-12-31'),
+       (2, 'MasterCard', '5555666677778888', '456', '2023-12-31');
+
+
+INSERT INTO TicketDelivery (BookingID, DeliveryMethod, DeliveryStatus)
+VALUES (1, 'Email', 'Delivered'),
+       (2,'Email','Delivered');
+
+
+
+
+
+
+
+
+       
+       
+
+
+
+
+

@@ -1,0 +1,107 @@
+-- QUESTION 1 
+
+SELECT 
+    e.EventName,
+    e.EventDate,
+    e.EventDescription,
+    tt.TicketTypeName,
+    tt.TotalTickets
+FROM
+    Event e
+    INNER JOIN TicketType tt ON e.EventID = tt.EventID
+WHERE
+    e.EventName = 'Exeter Food Festival 2023' 
+
+-- QUESTION 2 
+
+SELECT 
+    EventName,
+    EventStartTime,
+    EventEndTime,
+    EventDescription
+FROM 
+    Event
+WHERE 
+    EventDate >= '2023-07-01' AND EventDate <= '2023-07-10';
+
+
+-- QUESTION 3 
+
+SELECT 
+    AvailableTickets AS Amount,
+    Price
+FROM 
+    TicketType
+WHERE 
+    TicketTypeName = 'Bronze';
+
+
+
+-- QUESTION 4 
+
+SELECT c.FirstName, c.LastName, COUNT(t.TicketTypeID) AS NumberOfTickets
+FROM Customer c
+JOIN Booking b ON c.CustomerID = b.CustomerID
+JOIN Ticket tt ON b.BookingID = tt.BookingID
+JOIN TicketType t ON tt.TicketTypeID = t.TicketTypeID
+JOIN Event e ON t.EventID = e.EventID
+WHERE e.EventName = 'Emouth Music Festival 2023' AND t.TicketTypeName = 'Gold'
+GROUP BY c.FirstName, c.LastName;
+
+
+
+-- QUESTION 5 
+
+SELECT Event.EventName, SUM(Ticket.Quantity) AS SoldTickets
+FROM Event
+LEFT JOIN TicketType ON Event.EventID = TicketType.EventID
+LEFT JOIN Ticket ON TicketType.TicketTypeID = Ticket.TicketTypeID
+GROUP BY Event.EventID
+ORDER BY SoldTickets DESC;
+
+
+-- QUESTION 6 
+
+-- info for booking id 1
+
+SELECT 
+  b.BookingID,
+  CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
+  b.BookingDate,
+  e.EventName,
+  td.DeliveryMethod,
+  td.DeliveryStatus,
+  tt.TicketTypeName,
+  t.Quantity,
+  tt.Price,
+  tt.Price * t.Quantity AS TicketTotal,
+  b.TotalAmount AS TotalPayment
+FROM Booking b
+JOIN Customer c ON b.CustomerID = c.CustomerID
+JOIN Event e ON b.EventID = e.EventID
+JOIN TicketDelivery td ON b.BookingID = td.BookingID
+JOIN Ticket t ON b.BookingID = t.BookingID
+JOIN TicketType tt ON t.TicketTypeID = tt.TicketTypeID
+WHERE b.BookingID = 1;
+
+
+
+-- QUESTION 7 
+
+SELECT
+    e.EventName,
+    SUM(b.TotalAmount) AS TotalIncome
+FROM
+    Event e
+JOIN
+    Booking b ON e.EventID = b.EventID
+GROUP BY
+    e.EventID
+ORDER BY
+    TotalIncome DESC
+LIMIT 1;
+
+
+
+
+
